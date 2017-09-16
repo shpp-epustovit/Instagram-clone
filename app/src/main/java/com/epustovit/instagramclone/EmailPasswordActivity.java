@@ -4,9 +4,13 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,7 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class EmailPasswordActivity extends AppCompatActivity implements View.OnClickListener{
+public class EmailPasswordActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -27,6 +31,8 @@ public class EmailPasswordActivity extends AppCompatActivity implements View.OnC
     private TextView changeSignupModeTextView;
     private EditText userEmailEditText;
     private EditText passwordEditText;
+    private ImageView logoImageView;
+    private RelativeLayout backgroundRelativeLayout;
 
     @Override
     public void onClick(View view) {
@@ -49,15 +55,22 @@ public class EmailPasswordActivity extends AppCompatActivity implements View.OnC
 
             }
 
+        }else if(view.getId() == R.id.backgroundRelativeLayout || view.getId() == R.id.logoImageView){
+
+           // hide keyboard
+
+            InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
         }
 
     }
 
     public void signUp(View view) {
 
-        EditText userEmailEditText = (EditText) findViewById(R.id.userEmailEditText);
+        userEmailEditText = (EditText) findViewById(R.id.userEmailEditText);
 
-        EditText passwordEditText = (EditText) findViewById(R.id.passwordEditText);
+        passwordEditText = (EditText) findViewById(R.id.passwordEditText);
 
         if (userEmailEditText.getText().toString().matches("") || passwordEditText.getText().toString().matches("")) {
 
@@ -106,6 +119,17 @@ public class EmailPasswordActivity extends AppCompatActivity implements View.OnC
         changeSignupModeTextView.setOnClickListener(this);
 
 
+        logoImageView = (ImageView)findViewById(R.id.logoImageView);
+        backgroundRelativeLayout = (RelativeLayout)findViewById(R.id.backgroundRelativeLayout);
+
+        backgroundRelativeLayout.setOnClickListener(this);
+        logoImageView.setOnClickListener(this);
+
+
+        passwordEditText = (EditText)findViewById(R.id.passwordEditText);
+        passwordEditText.setOnKeyListener(this);
+
+
 
 
     }
@@ -136,5 +160,16 @@ public class EmailPasswordActivity extends AppCompatActivity implements View.OnC
                     Toast.makeText(EmailPasswordActivity.this, "Регистрация провалена", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+        if (i == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+
+            signUp(view);
+        }
+
+        return false;
     }
 }
